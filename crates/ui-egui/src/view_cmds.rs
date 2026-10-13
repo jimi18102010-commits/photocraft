@@ -583,6 +583,7 @@ fn wraps(id: &str) -> bool {
             | "file.automate.fitImage"
             | "file.automate.conditionalModeChange"
             | "file.automate.batch"
+            | "file.automate.socialExport"
             | "file.scripts.imageProcessor"
             | "file.scripts.loadFilesIntoStack"
             | "file.automate.photomerge"
@@ -1316,6 +1317,12 @@ fn front(app: &mut PhotocraftApp, id: &str, params: &Value) -> Option<Result<Val
             json!({"input": dir, "output": format!("{dir}/processed"), "format": "jpg", "quality": 8, "width": 0, "height": 0, "convertToSrgb": true}),
             json!({"format": ["jpg", "png", "psd", "tiff", "webp"]}),
         ),
+        "file.automate.socialExport" => dialog(
+            app,
+            json!({"input": dir, "output": format!("{dir}/social-export"), "preset": "instagram-post", "mode": "crop", "format": "png", "quality": 10.0, "background": "#191919",
+                "__labels": {"input": "Source folder", "output": "Destination folder", "preset": "Size preset", "mode": "Resize mode", "format": "Export format", "quality": "JPEG quality (0–12)", "background": "Fit background (#RRGGBB)", "instagram-post": "Square · 1080×1080", "instagram-portrait": "Portrait · 1080×1350", "story": "Story · 1080×1920", "youtube-thumbnail": "YouTube · 1280×720", "crop": "Crop (fill canvas)", "fit": "Fit (pad canvas)"}}),
+            json!({"preset": ["instagram-post", "instagram-portrait", "story", "youtube-thumbnail"], "mode": ["crop", "fit"], "format": ["png", "jpg"]}),
+        ),
         "file.automate.batch" => {
             let Some(action) = crate::actions::selected_action(app) else {
                 return Some(Err("record an action in the Actions panel first".into()));
@@ -1477,3 +1484,28 @@ fn export_contents(app: &mut PhotocraftApp) -> Result<Value, String> {
 #[cfg(test)]
 #[path = "view_cmds/tests.rs"]
 mod tests;
+
+/// Surface per-file results rather than treating a partial batch failure as success.
+pub(crate) fn social_export_status(app: &mut PhotocraftApp, result: &Value) {
+    let ok = result.get("succeeded").and_then(Value::as_u64).unwrap_or(0);
+    let failed = result.get("failed").and_then(Value::as_u64).unwrap_or(0);
+    let title = format!("Social Batch Export: {ok} succeeded, {failed} failed");
+    let mut lines: Vec<String> = result
+        .get("errors")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .map(|e| format!("{}: {}", e["file"].as_str().unwrap_or_default(), e["error"].as_str().unwrap_or_default()))
+        .collect();
+    lines.extend(
+        result
+            .get("warnings")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+            .map(|w| format!("{}: {}", w["file"].as_str().unwrap_or_default(), w["warning"].as_str().unwrap_or_default())),
+    );
+    crate::notices::post(app, title.clone(), lines, failed > 0, None);
+    app.ui.status = title;
+    app.ui.status_error = failed > 0;
+}

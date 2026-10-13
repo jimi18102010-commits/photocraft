@@ -480,3 +480,25 @@ fn esc_leaves_full_screen_modes_unless_something_else_owns_it() {
     assert_eq!(app.ui.view.screen_mode, "standard");
     assert!(app.session.active().unwrap().doc.selection.is_some());
 }
+
+#[test]
+fn social_batch_export_opens_without_a_document_or_recorded_action() {
+    let (mut app, ctx) = app_with(0);
+    assert!(is_live("file.automate.socialExport"));
+    let d = menu(&mut app, &ctx, "file.automate.socialExport", json!({})).unwrap()["dialog"].as_u64().unwrap();
+    let fields = &app.ui.dialog_mut(d).unwrap().fields;
+    assert_eq!(fields["preset"], "instagram-post");
+    assert_eq!(fields["mode"], "crop");
+    assert_eq!(fields["format"], "png");
+    assert!(fields["__choices"]["preset"].as_array().unwrap().len() == 4);
+    assert!(!fields.contains_key("steps"));
+}
+
+#[test]
+fn social_export_partial_failure_is_visible() {
+    let (mut app, _) = app_with(0);
+    social_export_status(&mut app, &json!({"succeeded": 2, "failed": 1, "errors": [{"file": "broken.png", "error": "invalid image"}], "warnings": []}));
+    assert!(app.ui.status_error);
+    assert!(app.ui.status.contains("2 succeeded, 1 failed"));
+    assert!(app.ui.notices.last().unwrap().lines[0].contains("broken.png"));
+}

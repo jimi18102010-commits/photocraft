@@ -1111,6 +1111,12 @@ impl PhotocraftApp {
                 self.ui.status_error = true;
             }
         }
+        if id == photocraft_engine::social_export_cmds::COMMAND
+            && let Ok(result) = &r
+            && result.get("succeeded").is_some()
+        {
+            crate::view_cmds::social_export_status(self, result);
+        }
         if suppress_events {
             self.session.edit_prefs(|prefs| prefs.script_events.enabled = true);
         }

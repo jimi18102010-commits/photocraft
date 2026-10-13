@@ -36,6 +36,9 @@ USAGE:
       when the set holds more than one) with the whole set loaded, so its steps can play other actions
       of the set. An --out folder that is the --in folder is refused, as the results would replace
       the originals; --in-place allows it.
+  photocraft-cli social-export --in <dir> --out <dir> [--preset <instagram-post|instagram-portrait|story|youtube-thumbnail>] [--mode <crop|fit>] [--format <png|jpg>] [--quality <0-12>] [--background <#RRGGBB>]
+      Export social-media sizes without recorded actions. Originals and existing outputs are never overwritten.
+      --json prints a machine-readable result. Partial failures return a nonzero exit status.
   photocraft-cli droplet <file.pcdroplet> <file-or-dir>… [--out <dir>]
       Run a droplet (File › Automate › Create Droplet) on images and folders.
   photocraft-cli commands [--json] [--filter <text>]
@@ -82,6 +85,12 @@ const SUBCOMMANDS: &[Subcommand] = &[
         values: &["--actions", "--action", "--in", "--out", "--format", "--quality", "--tga-bits", "--dpx-bits"],
         bare: &["--in-place", "--tiff-layers"],
         run: batch,
+    },
+    Subcommand {
+        name: "social-export",
+        values: &["--in", "--out", "--preset", "--mode", "--format", "--quality", "--background"],
+        bare: &["--json"],
+        run: social_export,
     },
     Subcommand { name: "droplet", values: &["--out"], bare: &[], run: droplet },
     Subcommand { name: "commands", values: &["--filter"], bare: &["--json"], run: |a, out, _| commands(a, out) },
@@ -509,6 +518,45 @@ fn batch(a: &Args, out: &mut dyn Write, err: &mut dyn Write) -> R {
     }
     let _ = writeln!(out, "{ok} succeeded, {failed} failed");
     if failed > 0 { Err(format!("{failed} file(s) failed")) } else { Ok(()) }
+}
+
+fn social_export(a: &Args, out: &mut dyn Write, err: &mut dyn Write) -> R {
+    if !a.positional.is_empty() {
+        return Err("social-export takes named flags, not positional arguments".into());
+    }
+    let mut p = json!({
+        "input": a.get("--in").ok_or("social-export needs --in <dir>")?,
+        "output": a.get("--out").ok_or("social-export needs --out <dir>")?,
+    });
+    for (flag, key) in [("--preset", "preset"), ("--mode", "mode"), ("--format", "format"), ("--background", "background")] {
+        if let Some(v) = a.get(flag) {
+            p[key] = json!(v);
+        }
+    }
+    if let Some(q) = a.get("--quality") {
+        let q: f64 = q.parse().map_err(|_| "quality must be a number from 0 to 12")?;
+        if !q.is_finite() || !(0.0..=12.0).contains(&q) {
+            return Err("quality must be a number from 0 to 12".into());
+        }
+        p["quality"] = json!(q);
+    }
+    let mut s = photocraft_engine::Session::new();
+    let r = s.execute(photocraft_engine::social_export_cmds::COMMAND, p).map_err(|e| e.to_string())?;
+    if a.has("--json") {
+        writeln!(out, "{}", serde_json::to_string_pretty(&r).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+    } else {
+        for f in r["files"].as_array().into_iter().flatten() {
+            writeln!(out, "ok    {}", f.as_str().unwrap_or_default()).map_err(|e| e.to_string())?;
+        }
+        writeln!(out, "{} succeeded, {} failed", r["succeeded"], r["failed"]).map_err(|e| e.to_string())?;
+    }
+    for e in r["errors"].as_array().into_iter().flatten() {
+        let _ = writeln!(err, "FAIL  {}: {}", e["file"].as_str().unwrap_or_default(), e["error"].as_str().unwrap_or_default());
+    }
+    for w in r["warnings"].as_array().into_iter().flatten() {
+        let _ = writeln!(err, "warning: {}: {}", w["file"].as_str().unwrap_or_default(), w["warning"].as_str().unwrap_or_default());
+    }
+    if r["failed"].as_u64().unwrap_or(0) > 0 { Err("some images could not be exported; see the report".into()) } else { Ok(()) }
 }
 
 fn droplet(a: &Args, out: &mut dyn Write, err: &mut dyn Write) -> R {

@@ -505,6 +505,10 @@ fn on_event(app: &mut PhotocraftApp, ctx: &egui::Context, e: JobEvent) {
             app.sync_views();
             crate::file_ui::print_status(app, result);
         }
+        JobOutcome::Done(ref result) if e.command == photocraft_engine::social_export_cmds::COMMAND => {
+            app.sync_views();
+            crate::view_cmds::social_export_status(app, result);
+        }
         JobOutcome::Done(_) => {
             app.sync_views();
             app.ui.status = e.label;

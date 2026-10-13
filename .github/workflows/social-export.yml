@@ -1,0 +1,51 @@
+name: Social Batch Export
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: social-export-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  feature-tests:
+    runs-on: ubuntu-latest
+    env:
+      CARGO_BUILD_JOBS: 2
+      CARGO_PROFILE_DEV_DEBUG: 0
+      PHOTOCRAFT_NO_PRINT: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - run: sudo apt-get update && sudo apt-get install -y libx11-dev libxi-dev libxrandr-dev libxcursor-dev libxkbcommon-dev libwayland-dev libasound2-dev libudev-dev pkg-config mesa-vulkan-drivers
+      - run: cargo fmt --all -- --check
+      - run: cargo test -p photocraft-engine social_export_cmds --lib
+      - run: cargo test -p photocraft-cli --test cli social_export
+      - run: cargo test -p photocraft-ui-egui social_ --lib
+      - run: cargo clippy -p photocraft-engine -p photocraft-cli -p photocraft-ui-egui --lib -- -D warnings
+      - run: cargo xtask layers
+      - run: cargo check -p photocraft-engine -p photocraft-ui-egui --target wasm32-unknown-unknown
+  cli-artifacts:
+    needs: feature-tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release -p photocraft-cli
+      - uses: actions/upload-artifact@v4
+        with:
+          name: photocraft-cli-${{ matrix.os }}
+          path: |
+            target/release/photocraft-cli
+            target/release/photocraft-cli.exe
+          if-no-files-found: error

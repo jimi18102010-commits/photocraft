@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="440" viewBox="0 0 1280 440" role="img" aria-labelledby="title desc">
+<title id="title">PhotoCraft — Jimmiy Edition</title><desc id="desc">Rust-native social batch export. Four presets. Two resize modes. No overwrites.</desc>
+<rect width="1280" height="440" fill="#0d1117"/>
+<rect x="48" y="48" width="1184" height="344" rx="12" fill="#161b22" stroke="#30363d"/>
+<g font-family="Arial, sans-serif">
+<rect x="80" y="80" width="4" height="24" fill="#5e9fe8"/><text x="100" y="98" fill="#8b949e" font-size="16" letter-spacing="3">JIMMIY / RUST NATIVE</text>
+<text x="80" y="178" fill="#f0f6fc" font-size="54" font-weight="700">PhotoCraft</text>
+<text x="80" y="224" fill="#5e9fe8" font-size="28">Social Batch Export</text>
+<text x="80" y="268" fill="#b1bac4" font-size="20">One folder. Four sizes. Originals untouched.</text>
+<text x="80" y="340" fill="#8b949e" font-size="16">4 SIZE PRESETS</text><text x="270" y="340" fill="#8b949e" font-size="16">CROP + FIT</text><text x="440" y="340" fill="#8b949e" font-size="16">PNG + JPEG</text>
+<g transform="translate(850 106)">
+<rect x="0" y="74" width="110" height="110" rx="8" fill="#1b2e43" stroke="#5e9fe8" stroke-width="2"/>
+<rect x="130" y="0" width="86" height="184" rx="8" fill="#20382c" stroke="#72bc8f" stroke-width="2"/>
+<path d="M20 147h70M20 164h45" stroke="#5e9fe8" stroke-width="3"/>
+<path d="M148 144h50M148 160h34" stroke="#72bc8f" stroke-width="3"/>
+<text x="0" y="216" fill="#8b949e" font-size="14">1080 × 1080</text><text x="132" y="216" fill="#8b949e" font-size="14">1080 × 1920</text>
+</g>
+</g></svg>

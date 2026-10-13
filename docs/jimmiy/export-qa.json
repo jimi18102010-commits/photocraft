@@ -1,0 +1,85 @@
+{
+  "runs": [
+    {
+      "preset": "instagram-post",
+      "mode": "crop",
+      "size": [
+        1080,
+        1080
+      ],
+      "succeeded": 1,
+      "failed": 0
+    },
+    {
+      "preset": "instagram-post",
+      "mode": "fit",
+      "size": [
+        1080,
+        1080
+      ],
+      "succeeded": 1,
+      "failed": 0
+    },
+    {
+      "preset": "instagram-portrait",
+      "mode": "crop",
+      "size": [
+        1080,
+        1350
+      ],
+      "succeeded": 1,
+      "failed": 0
+    },
+    {
+      "preset": "instagram-portrait",
+      "mode": "fit",
+      "size": [
+        1080,
+        1350
+      ],
+      "succeeded": 1,
+      "failed": 0
+    },
+    {
+      "preset": "story",
+      "mode": "crop",
+      "size": [
+        1080,
+        1920
+      ],
+      "succeeded": 1,
+      "failed": 0
+    },
+    {
+      "preset": "story",
+      "mode": "fit",
+      "size": [
+        1080,
+        1920
+      ],
+      "succeeded": 1,
+      "failed": 0
+    },
+    {
+      "preset": "youtube-thumbnail",
+      "mode": "crop",
+      "size": [
+        1280,
+        720
+      ],
+      "succeeded": 1,
+      "failed": 0
+    },
+    {
+      "preset": "youtube-thumbnail",
+      "mode": "fit",
+      "size": [
+        1280,
+        720
+      ],
+      "succeeded": 1,
+      "failed": 0
+    }
+  ],
+  "source_unchanged": true
+}

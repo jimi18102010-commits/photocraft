@@ -48,7 +48,7 @@ fn usage_and_unknown_command() {
 #[test]
 fn every_subcommand_answers_help() {
     let d = tmp("help");
-    for sub in ["convert", "info", "run", "batch", "droplet", "commands", "mcp", "serve"] {
+    for sub in ["convert", "info", "run", "batch", "social-export", "droplet", "commands", "mcp", "serve"] {
         for help in ["--help", "-h"] {
             let o = bin().current_dir(&d).arg(sub).arg(help).arg("--out").arg("x.png").stdin(Stdio::null()).output().unwrap();
             let out = String::from_utf8_lossy(&o.stdout);
@@ -747,4 +747,53 @@ fn batch_plays_a_photoshop_actions_file() {
     let err = String::from_utf8_lossy(&o.stderr);
     assert!(err.contains("Generative Fill"), "{err}");
     assert!(!o.status.success());
+}
+
+#[test]
+fn social_export_cli_renders_jpeg_and_reports_collisions() {
+    let d = tmp("social-export");
+    let input = d.join("input");
+    let output = d.join("output");
+    std::fs::create_dir_all(&input).unwrap();
+    write_png(&input.join("photo.png"), 32, 16, 3);
+    let original = std::fs::read(input.join("photo.png")).unwrap();
+    let args = [
+        "social-export",
+        "--in",
+        input.to_str().unwrap(),
+        "--out",
+        output.to_str().unwrap(),
+        "--preset",
+        "youtube-thumbnail",
+        "--format",
+        "jpg",
+        "--mode",
+        "fit",
+        "--json",
+    ];
+    let (out, _) = ok(bin().args(args));
+    let report: Value = serde_json::from_str(&out).unwrap();
+    assert_eq!(report["succeeded"], 1);
+    let bytes = std::fs::read(report["files"][0].as_str().unwrap()).unwrap();
+    let image = photocraft_codecs::decode(&bytes).unwrap();
+    assert_eq!((image.width(), image.height()), (1280, 720));
+    assert_eq!(std::fs::read(input.join("photo.png")).unwrap(), original);
+    let failed = bin().args(args).output().unwrap();
+    assert!(!failed.status.success());
+    let report: Value = serde_json::from_slice(&failed.stdout).unwrap();
+    assert_eq!(report["failed"], 1);
+    assert_eq!(std::fs::read(output.join("photo-youtube-thumbnail.jpg")).unwrap(), bytes);
+}
+
+#[test]
+fn social_export_cli_rejects_bad_options() {
+    for args in [
+        vec!["social-export", "--in", "unused", "--out", "unused", "--quality", "NaN"],
+        vec!["social-export", "--in", "unused", "--out", "unused", "--preset", "fake"],
+        vec!["social-export", "--in", "unused", "--out", "unused", "--mode", "stretch"],
+        vec!["social-export", "--in", "unused", "--out", "unused", "--fromat", "png"],
+        vec!["social-export"],
+    ] {
+        assert!(!bin().args(args).output().unwrap().status.success());
+    }
 }

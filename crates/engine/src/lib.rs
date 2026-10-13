@@ -104,6 +104,7 @@ pub mod slice_cmds;
 pub mod smart_cmds;
 pub mod smartselect_cmds;
 pub mod snap;
+pub mod social_export_cmds;
 pub mod solid_fill_cmds;
 pub mod stamp_cmds;
 pub mod swatch_cmds;
