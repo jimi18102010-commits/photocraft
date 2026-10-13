@@ -42,6 +42,6 @@ Cancellation is checked between files/stages; it does not undo already written o
 
 ## Artifacts
 
-The chat delivery includes the complete source ZIP and a locally compiled **Linux x86_64 development/test bundle** with desktop app, CLI, notices and QA files. It is not a signed release. GitHub contains source, documentation and a configured CI workflow; a remote CI pass or new GitHub Release is not claimed.
+The chat delivery includes the complete source ZIP. Desktop and CLI Linux test binaries were successfully built and checked in the earlier local run, but the temporary computer reset on continuation before those binaries could be delivered; the binary bundle is therefore not available in this handoff. The results above record that earlier run, not a second run after the reset. Build locally using the README or use the configured CI workflow. GitHub contains source and documentation; a remote CI pass, signed installer or new GitHub Release is not claimed.
 
 Reproduce the eight export checks by using each listed preset with both resize modes. Their measured dimensions/results are recorded in [export-qa.json](export-qa.json).
