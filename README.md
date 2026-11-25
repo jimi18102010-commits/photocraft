@@ -1,6 +1,6 @@
 <div align="center">
 
-![PhotoCraft — Jimmiy Edition](docs/jimmiy/cover.svg)
+![PhotoCraft — Jimmy Edition](docs/jimmiy/cover.svg)
 
 **Rust-native photo editing, with safe social-media batch export.**
 
@@ -13,7 +13,7 @@
 
 ## What this project is
 
-This is **Jimmiy's feature fork of [PhotoCraft](https://github.com/storytold/photocraft)** by the ArtCraft team and contributors, based on upstream commit `99e1138877e6aa7e856c6883b415e708d042fc59` (0.8.2). The original editor, PSD engine, egui UI and wgpu compositor are upstream work — not claimed as newly written here.
+This is **Jimmy's feature fork of [PhotoCraft](https://github.com/storytold/photocraft)** by the ArtCraft team and contributors, based on upstream commit `99e1138877e6aa7e856c6883b415e708d042fc59` (0.8.2). The original editor, PSD engine, egui UI and wgpu compositor are upstream work — not claimed as newly written here.
 
 The new work in this fork is **Social Batch Export**: a native dialog, a Rust engine command, a CLI subcommand, safety checks, background progress, per-file reports and regression tests. No Electron, Tauri, JavaScript UI or cloud service is added.
 
@@ -100,6 +100,6 @@ See [verification](docs/jimmiy/verification.md) for the actual local results and
 
 ## Credits and license
 
-Original PhotoCraft: © 2026 ArtCraft Team and PhotoCraft contributors. This feature fork adds work for Jimmiy. Source remains **MIT OR Apache-2.0**. Keep [NOTICE](NOTICE), [LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE](LICENSE-APACHE), and [ATTRIBUTION.md](ATTRIBUTION.md).
+Original PhotoCraft: © 2026 ArtCraft Team and PhotoCraft contributors. This feature fork adds work for Jimmy. Source remains **MIT OR Apache-2.0**. Keep [NOTICE](NOTICE), [LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE](LICENSE-APACHE), and [ATTRIBUTION.md](ATTRIBUTION.md).
 
 Restricted ArtCraft wordmark/logo assets were removed from this modified distribution in accordance with their license. This fork is not an official ArtCraft product and is not endorsed by the upstream team. The original source attribution and license notices are preserved.
